@@ -67,6 +67,7 @@ TinyGPSCustom vdop(GPS, PSTR("GPGSA"), 17); // $GPGSA sentence, 17th element
 TinyGPSCustom fix(GPS, PSTR("GPGGA"), 6);
 TinyGPSCustom fix_mode(GPS, PSTR("GPGSA"), 2);
 
+
 // GPS Satellites in view
 GSV GPS_GSV;
 

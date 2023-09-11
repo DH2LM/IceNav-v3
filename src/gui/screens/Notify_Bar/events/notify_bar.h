@@ -97,15 +97,15 @@ void update_notify_bar(lv_timer_t *t)
     lv_event_send(gps_count, LV_EVENT_VALUE_CHANGED, NULL);
     lv_event_send(gps_fix_mode, LV_EVENT_VALUE_CHANGED, NULL);
 
-    switch (atoi(fix.value()))
+    switch (atoi(fix_mode.value()))
     {
-    case 0:
+    case 1:
         lv_led_off(gps_fix);
         break;
-    case 1:
+    case 2:
         lv_led_toggle(gps_fix);
         break;
-    case 2:
+    case 3:
         lv_led_toggle(gps_fix);
         break;
     default:
