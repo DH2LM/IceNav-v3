@@ -35,7 +35,7 @@ static void configure_map_rotation(lv_event_t *event)
 static void increment_zoom(lv_event_t *event)
 {
     lv_event_code_t code = lv_event_get_code(event);
-    if (code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT)
+    if (code == LV_EVENT_SHORT_CLICKED ) //|| code == LV_EVENT_LONG_PRESSED_REPEAT)
     {
         lv_spinbox_increment(zoom_level);
         def_zoom = (uint8_t)lv_spinbox_get_value(zoom_level);
