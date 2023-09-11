@@ -110,13 +110,13 @@ void create_main_scr()
     latitude = lv_label_create(compass_tile);
     lv_obj_set_size(latitude, 200, 20);
     lv_obj_set_style_text_font(latitude, &lv_font_montserrat_16, 0);
-    lv_label_set_text_static(latitude, Latitude_formatString(GPS.location.lat()));
+    lv_label_set_text_static(latitude, Latitude_formatString(current_gps.location.lat()));
     lv_obj_set_pos(latitude, 55, 12);
 
     longitude = lv_label_create(compass_tile);
     lv_obj_set_size(longitude, 200, 20);
     lv_obj_set_style_text_font(longitude, &lv_font_montserrat_16, 0);
-    lv_label_set_text_static(longitude, Longitude_formatString(GPS.location.lng()));
+    lv_label_set_text_static(longitude, Longitude_formatString(current_gps.location.lng()));
     lv_obj_set_pos(longitude, 55, 28);
 
     altitude = lv_label_create(compass_tile);
@@ -169,7 +169,7 @@ void create_main_scr()
     lv_label_set_text_fmt(vdop_label, "VDOP:\n%s", vdop.value());
    
     alt_label = lv_label_create(info_grid);
-    lv_label_set_text_fmt(alt_label, "ALT:\n%4dm.", (int)GPS.altitude.meters());
+    lv_label_set_text_fmt(alt_label, "ALT:\n%4dm.", (int)current_gps.altitude.meters());
    
     satbar_1 = lv_chart_create(sat_track_tile);
     lv_obj_set_size(satbar_1, TFT_WIDTH, 55);

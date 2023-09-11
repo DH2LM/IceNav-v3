@@ -30,8 +30,8 @@ static const char *map_scale[] = {"5000 Km", "2500 Km", "1500 Km", "700 Km", "35
  */
 static double getLat()
 {
-  if (GPS.location.isValid())
-    return GPS.location.lat();
+  if (current_gps.location.isValid())
+    return current_gps.location.lat();
   else
   {
 #ifdef DEFAULT_LAT
@@ -48,8 +48,8 @@ static double getLat()
  */
 static double getLon()
 {
-  if (GPS.location.isValid())
-    return GPS.location.lng();
+  if (current_gps.location.isValid())
+    return current_gps.location.lng();
   else
   {
 #ifdef DEFAULT_LON
@@ -195,7 +195,7 @@ static void update_map(lv_event_t *event)
     if (map_rotation)
       map_heading = get_heading();
     else
-      map_heading = GPS.course.deg();
+      map_heading = current_gps.course.deg();
     map_spr.pushRotated(&map_rot, 360 - map_heading, TFT_TRANSPARENT);
     if (show_map_compass)
     {
@@ -203,7 +203,7 @@ static void update_map(lv_event_t *event)
       map_rot.pushImageRotateZoom(TFT_WIDTH - 24, 24, 24, 24, 360 - heading, 1, 1, 48, 48, (uint16_t *)mini_compass, TFT_BLACK);
     }
 #else
-    map_heading = GPS.course.deg();
+    map_heading = current_gps.course.deg();
     map_spr.pushRotated(&map_rot, 360 - map_heading, TFT_TRANSPARENT);
     // map_spr.pushRotated(&map_rot, 0, TFT_TRANSPARENT);
 #endif
@@ -217,7 +217,7 @@ static void update_map(lv_event_t *event)
     {
       map_rot.fillRectAlpha(0, 342, 70, 32, 95, TFT_BLACK);
       map_rot.pushImage(0, 346, 24, 24, (uint16_t *)speed_ico, TFT_BLACK);
-      map_rot.drawNumber((uint16_t)GPS.speed.kmph(), 26, 350, &fonts::FreeSansBold9pt7b);
+      map_rot.drawNumber((uint16_t)current_gps.speed.kmph(), 26, 350, &fonts::FreeSansBold9pt7b);
     }
 
     if (show_map_scale)

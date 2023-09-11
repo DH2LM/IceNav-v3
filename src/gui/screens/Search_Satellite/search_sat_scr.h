@@ -45,10 +45,10 @@ void create_search_sat_scr()
  */
 void search_gps(lv_timer_t *t)
 {
-    if (GPS.location.isValid())
+     if (current_gps.location.isValid())
     {
         is_gps_fixed = true;
-        setTime(GPS.time.hour(), GPS.time.minute(), GPS.time.second(), GPS.date.day(), GPS.date.month(), GPS.date.year());
+        setTime(current_gps.time.hour(),current_gps.time.minute(), current_gps.time.second(),current_gps.date.day(), current_gps.date.month(), current_gps.date.year());
         // UTC Time
         utc = now();
         // Local Time

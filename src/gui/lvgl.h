@@ -38,7 +38,7 @@ static lv_timer_t *timer_main;
  * @brief  Main Screen update time
  *
  */
-#define UPDATE_MAINSCR_PERIOD 30
+#define UPDATE_MAINSCR_PERIOD 20
 
 /**
  * @brief Extra screen definitions

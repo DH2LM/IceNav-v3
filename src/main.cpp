@@ -35,6 +35,13 @@ unsigned long millis_actual = 0;
 #endif
 #include "hardware/battery.h"
 #include "hardware/power.h"
+
+#include "tasks.h"
+// DATETIME_t current_datetime;
+// GPS_DATA_t current_gps_data;
+// TinyGPSPlus current_gps;
+GPS_t my_gps;
+
 #include "utils/gps_maps.h"
 #include "utils/gps_math.h"
 #include "utils/sat_info.h"
@@ -42,8 +49,6 @@ unsigned long millis_actual = 0;
 #include "utils/lv_sd_fs.h"
 #include "utils/time_zone.h"
 #include "gui/lvgl.h"
-
-#include "tasks.h"
 
 /**
  * @brief Setup
@@ -80,7 +85,7 @@ void setup()
   map_spr.createSprite(768, 768);
 
   splash_scr();
-  // init_tasks();
+  init_tasks(&my_gps, GPS, gps);
 
 #ifdef DEFAULT_LAT
   load_main_screen();
@@ -95,18 +100,9 @@ void setup()
  */
 void loop()
 {
-  while (gps->available() > 0)
-  {
-#ifdef OUTPUT_NMEA
-    debug->write(gps->read());
-#else
-    GPS.encode(gps->read());
-#endif
-  }
-
 #ifdef MAKERF_ESP32S3
   lv_tick_inc(5);
 #endif
   lv_timer_handler();
-  // lv_task_handler();
+  lv_task_handler();
 }

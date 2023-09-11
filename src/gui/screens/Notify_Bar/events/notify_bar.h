@@ -81,8 +81,8 @@ static void update_time(lv_event_t *event)
 static void update_gps_count(lv_event_t *event)
 {
     lv_obj_t *gps_num = lv_event_get_target(event);
-    if (GPS.satellites.isValid())
-        lv_label_set_text_fmt(gps_num, LV_SYMBOL_GPS "%2d", GPS.satellites.value());
+    if (current_gps.satellites.isValid())
+        lv_label_set_text_fmt(gps_num, LV_SYMBOL_GPS "%2d", current_gps.satellites.value());
     else
         lv_label_set_text_fmt(gps_num, LV_SYMBOL_GPS "%2d", 0);
 }

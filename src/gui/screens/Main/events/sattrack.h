@@ -43,8 +43,8 @@ static void update_sattrack(lv_event_t *event)
         lv_label_set_text_fmt(vdop_label, "VDOP:\n%s", vdop.value());
     }
 
-    if (GPS.altitude.isUpdated())
-        lv_label_set_text_fmt(alt_label, "ALT:\n%4dm.", (int)GPS.altitude.meters());
+    if (current_gps.altitude.isUpdated())
+        lv_label_set_text_fmt(alt_label, "ALT:\n%4dm.", (int)current_gps.altitude.meters());
 
     create_sat_spr(spr_Sat);
     create_const_spr(constel_spr);

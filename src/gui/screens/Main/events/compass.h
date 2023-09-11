@@ -28,7 +28,7 @@ static void update_heading(lv_event_t *event)
 static void update_latitude(lv_event_t *event)
 {
     lv_obj_t *lat = lv_event_get_target(event);
-    lv_label_set_text_static(lat, Latitude_formatString(GPS.location.lat()));
+    lv_label_set_text_static(lat, Latitude_formatString(current_gps.location.lat()));
 }
 
 /**
@@ -39,7 +39,7 @@ static void update_latitude(lv_event_t *event)
 static void update_longitude(lv_event_t *event)
 {
     lv_obj_t *lon = lv_event_get_target(event);
-    lv_label_set_text_static(lon, Longitude_formatString(GPS.location.lng()));
+    lv_label_set_text_static(lon, Longitude_formatString(current_gps.location.lng()));
 }
 
 /**
@@ -50,7 +50,7 @@ static void update_longitude(lv_event_t *event)
 static void update_altitude(lv_event_t *event)
 {
     lv_obj_t *alt = lv_event_get_target(event);
-    lv_label_set_text_fmt(altitude, "%4d m.", (int)GPS.altitude.meters());
+    lv_label_set_text_fmt(altitude, "%4d m.", (int)current_gps.altitude.meters());
 }
 
 /**
@@ -61,5 +61,5 @@ static void update_altitude(lv_event_t *event)
 static void update_speed(lv_event_t *event)
 {
     lv_obj_t *speed = lv_event_get_target(event);
-    lv_label_set_text_fmt(speed, "%3d Km/h", (int)GPS.speed.kmph());
+    lv_label_set_text_fmt(speed, "%3d Km/h", (int)current_gps.speed.kmph());
 }

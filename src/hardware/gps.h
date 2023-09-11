@@ -93,27 +93,27 @@ struct
  */
 void init_gps()
 {
-  gps->begin(GPS_BAUD[gps_speed], SERIAL_8N1, GPS_RX, GPS_TX);
+//   gps->begin(GPS_BAUD[gps_speed], SERIAL_8N1, GPS_RX, GPS_TX);
 
-#ifdef AT6558D_GPS
-  // GPS
-  // gps->println("$PCAS04,1*18\r\n");
-  // GPS+GLONASS
-  // gps->println("$PCAS04,5*1C\r\n");
-  // GPS+BDS+GLONASS
-  gps->println("$PCAS04,7*1E\r\n");
-  gps->flush();
-  delay(100);
+// #ifdef AT6558D_GPS
+//   // GPS
+//   // gps->println("$PCAS04,1*18\r\n");
+//   // GPS+GLONASS
+//   // gps->println("$PCAS04,5*1C\r\n");
+//   // GPS+BDS+GLONASS
+//   gps->println("$PCAS04,7*1E\r\n");
+//   gps->flush();
+//   delay(100);
 
-  gps->println(GPS_RATE_PCAS[gps_update]);
-  gps->flush();
-  delay(100);
+//   gps->println(GPS_RATE_PCAS[gps_update]);
+//   gps->flush();
+//   delay(100);
 
-  // Set NMEA 4.1
-  gps->println("$PCAS05,2*1A\r\n");
-  gps->flush();
-  delay(100);
-#endif
+//   // Set NMEA 4.1
+//   gps->println("$PCAS05,2*1A\r\n");
+//   gps->flush();
+//   delay(100);
+//#endif
 
   // Initialize satellites in view custom NMEA structure
   GPS_GSV.totalMsg.begin(GPS, PSTR("GPGSV"), 1);

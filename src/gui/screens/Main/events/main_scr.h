@@ -118,6 +118,7 @@ static void scroll_tile(lv_event_t *event)
  */
 static void update_main_screen(lv_timer_t *t)
 {
+    //serial_read_gps(&current_gps);
     if (is_scrolled && is_main_screen)
     {
         switch (act_tile)
@@ -128,23 +129,23 @@ static void update_main_screen(lv_timer_t *t)
             lv_event_send(compass_heading, LV_EVENT_VALUE_CHANGED, NULL);
 #endif
 
-            if (GPS.location.isUpdated())
+            //if (current_gps.location.isUpdated())
             {
                 lv_event_send(latitude, LV_EVENT_VALUE_CHANGED, NULL);
                 lv_event_send(longitude, LV_EVENT_VALUE_CHANGED, NULL);
             }
-            if (GPS.altitude.isUpdated())
+            //if (current_gps.altitude.isUpdated())
             {
                 lv_event_send(altitude, LV_EVENT_VALUE_CHANGED, NULL);
             }
 
-            if (GPS.speed.isUpdated())
+           // if (current_gps.isUpdated())
                 lv_event_send(speed_label, LV_EVENT_VALUE_CHANGED, NULL);
 
             break;
 
         case MAP:
-            // if (GPS.location.isUpdated())
+            // if (current_gps_data.isUpdated())
             lv_event_send(map_tile, LV_EVENT_REFRESH, NULL);
             break;
 
