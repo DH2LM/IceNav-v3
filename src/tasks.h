@@ -54,18 +54,22 @@ void Read_GPS(void *pvParameters)
 {
   const TickType_t max_blocking_time = pdMS_TO_TICKS(200); // ms
   log_v("Task1 - Read GPS - running on core %d", xPortGetCoreID());
-  log_v("Stack size: %d",uxTaskGetStackHighWaterMark(NULL));
+  log_v("Stack size: %d", uxTaskGetStackHighWaterMark(NULL));
   while (1)
   {
+
     ulTaskNotifyTake(pdTRUE, max_blocking_time);
     xTimerStart(timer_h, portMAX_DELAY);
-    task_gps->gps.encode(task_gps->serial_gps_handle->read());
-
-    //if (task_gps->gps.sentencesWithFix() > 1)
+    while (task_gps->serial_gps_handle->available() > 0)
     {
-      xSemaphoreTake(gps_data_mutex, portMAX_DELAY);
-      current_gps = task_gps->gps;
-      xSemaphoreGive(gps_data_mutex);
+      task_gps->gps.encode(task_gps->serial_gps_handle->read());
+
+      // if (task_gps->gps.sentencesWithFix() > 1)
+      {
+        xSemaphoreTake(gps_data_mutex, portMAX_DELAY);
+        current_gps = task_gps->gps;
+        xSemaphoreGive(gps_data_mutex);
+      }
     }
   }
 }
@@ -100,5 +104,5 @@ void init_tasks(GPS_t *gps_t, TinyGPSPlus gps_, HardwareSerial *serial_port)
   gps_data_mutex = xSemaphoreCreateMutex();
   timer_h = xTimerCreate("read_gps_timer", GPS_READ_FREQUENCY / portTICK_PERIOD_MS, pdTRUE, (void *)0, gps_timer_callback);
   xTaskCreatePinnedToCore(Read_GPS, "read_GPS", 20000, NULL, 1, &read_gps_task_handle, 1);
-  //xTaskCreatePinnedToCore(Read_GPS, "read_GPS", 20000, NULL, 1, NULL, 1);
+  // xTaskCreatePinnedToCore(Read_GPS, "read_GPS", 20000, NULL, 1, NULL, 1);
 }
