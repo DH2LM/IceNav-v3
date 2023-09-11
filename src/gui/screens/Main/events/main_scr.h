@@ -118,7 +118,6 @@ static void scroll_tile(lv_event_t *event)
  */
 static void update_main_screen(lv_timer_t *t)
 {
-    //serial_read_gps(&current_gps);
     if (is_scrolled && is_main_screen)
     {
         switch (act_tile)
@@ -134,6 +133,7 @@ static void update_main_screen(lv_timer_t *t)
                 lv_event_send(latitude, LV_EVENT_VALUE_CHANGED, NULL);
                 lv_event_send(longitude, LV_EVENT_VALUE_CHANGED, NULL);
             }
+            
             //if (current_gps.altitude.isUpdated())
             {
                 lv_event_send(altitude, LV_EVENT_VALUE_CHANGED, NULL);
