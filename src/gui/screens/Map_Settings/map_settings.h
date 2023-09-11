@@ -53,7 +53,7 @@ static void create_map_settings_scr()
     lv_obj_set_align(list, LV_ALIGN_LEFT_MID);
 
     btn = lv_btn_create(list);
-    lv_obj_set_size(btn, 40, 40);
+    lv_obj_set_size(btn, 50, 50);
     lv_obj_align_to(btn, list, LV_ALIGN_LEFT_MID, 0, 0);
     lv_obj_set_style_bg_img_src(btn, LV_SYMBOL_PLUS, 0);
     lv_obj_add_event_cb(btn, increment_zoom, LV_EVENT_ALL, NULL);
@@ -69,7 +69,7 @@ static void create_map_settings_scr()
     lv_obj_hide_cursor(zoom_level);
 
     btn = lv_btn_create(list);
-    lv_obj_set_size(btn, 40, 40);
+    lv_obj_set_size(btn, 50, 50);
     lv_obj_align_to(btn, list, LV_ALIGN_RIGHT_MID, 0, 0);
     lv_obj_set_style_bg_img_src(btn, LV_SYMBOL_MINUS, 0);
     lv_obj_add_event_cb(btn, decrement_zoom, LV_EVENT_ALL, NULL);
