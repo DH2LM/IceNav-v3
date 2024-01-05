@@ -7,6 +7,7 @@
  */
 
 void load_main_screen();
+void loadIconScreen();
 
 /**
  * @brief Back button event
@@ -41,7 +42,16 @@ static void touch_calib(lv_event_t *event)
 static void compass_calib(lv_event_t *event)
 {
     tft.fillScreen(TFT_BLACK);
+    #ifdef ENABLE_COMPASS
     compass_calibrate();
+    #endif
     is_main_screen = false;
     lv_scr_load(settingsScreen);
+}
+
+static void showIcons(lv_event_t *event)
+{
+    tft.fillScreen(TFT_WHITE);
+    is_main_screen = false;
+    loadIconScreen();
 }

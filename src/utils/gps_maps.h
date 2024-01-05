@@ -13,6 +13,7 @@
 struct MapTile
 {
   char *file;
+  char* dir;
   uint32_t tilex;
   uint32_t tiley;
   uint8_t zoom;
@@ -85,12 +86,15 @@ uint16_t lat2posy(float f_lat, uint8_t zoom)
 MapTile get_map_tile(double lon, double lat, uint8_t zoom_level, int16_t off_x, int16_t off_y)
 {
   static char s_file[40] = "";
+  static char s_dir[40] = "";
   uint32_t x = lon2tilex(lon, zoom_level) + off_x;
   uint32_t y = lat2tiley(lat, zoom_level) + off_y;
 
   sprintf(s_file, PSTR("/MAP/%d/%d/%d.png"), zoom_level, x, y);
+  sprintf(s_dir, PSTR("/MAP/%d/%d/"), zoom_level, x);
   MapTile data;
   data.file = s_file;
+  data.dir = s_dir;
   data.tilex = x;
   data.tiley = y;
   data.zoom = zoom_level;

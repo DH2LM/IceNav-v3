@@ -17,6 +17,9 @@ Preferences preferences;
 static void load_preferences()
 {
     preferences.begin("ICENAV",false);
+    #ifndef ENABLE_COMPASS
+    float offx, offy;
+    #endif
     offx = preferences.getFloat("C_offset_x",0.0);
     offy = preferences.getFloat("C_offset_y",0.0);
     log_v("OFFSET X  %f",offx);

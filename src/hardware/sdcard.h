@@ -12,7 +12,7 @@
 #ifdef MAKERF_ESP32S3
 SPIClass spiSD = SPIClass(HSPI); 
 #else
-SPIClass spiSD = SPIClass(VSPI);
+SPIClass spiSD = SPIClass();
 #endif
 bool sdloaded = false;
 

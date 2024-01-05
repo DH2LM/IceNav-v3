@@ -6,6 +6,40 @@
  * @date 2023-06-14
  */
 
+bool useAlt=false;
+
+void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
+  Serial.printf("Listing directory: %s\n", dirname);
+
+  File root = fs.open(dirname);
+  if(!root){
+    Serial.println("Failed to open directory");
+    return;
+  }
+  if(!root.isDirectory()){
+    Serial.println("Not a directory");
+    return;
+  }
+
+  File file = root.openNextFile();
+  while(file){
+    if(file.isDirectory()){
+      Serial.print("  DIR : ");
+      Serial.println(file.name());
+      if(levels){
+        listDir(fs, file.name(), levels -1);
+      }
+    } else {
+      Serial.print("  FILE: ");
+      Serial.print(file.name());
+      Serial.print("  SIZE: ");
+      Serial.println(file.size());
+    }
+     file = root.openNextFile();
+  }
+}
+
+
 /**
  * @brief Map tile coordinates and zoom
  *
@@ -104,6 +138,7 @@ static void delete_map_scr_sprites()
   sprArrow.deleteSprite();
   map_rot.deleteSprite();
   zoom_spr.deleteSprite();
+  test_spr.deleteSprite();
 }
 
 /**
@@ -116,9 +151,9 @@ static void create_map_scr_sprites()
   map_rot.createSprite(320, 374);
   map_rot.pushSprite(0, 27);
   // Arrow Sprite
-  sprArrow.createSprite(16, 16);
+  sprArrow.createSprite(20, 20);
   sprArrow.setColorDepth(16);
-  sprArrow.pushImage(0, 0, 16, 16, (uint16_t *)navigation);
+  sprArrow.pushImage(0, 0, 20, 20, (uint16_t *)navigation);
   // Zoom Sprite
   zoom_spr.createSprite(48, 28);
   zoom_spr.setColorDepth(16);
@@ -139,6 +174,26 @@ static void update_map(lv_event_t *event)
   {
     is_map_draw = false;
     map_found = false;
+    test_spr.deleteSprite();
+    useAlt = !useAlt;
+      test_spr.createSprite(TFT_WIDTH, TFT_HEIGHT);
+  test_spr.setColorDepth(16);
+  uint8_t i=0;
+  for(int y=0; y<6; y++)
+  {
+    for(int x=0; x<16; x++)
+    {
+      if(!useAlt)
+      {
+        test_spr.pushImage(x*20, y*20, 20, 20, (uint16_t*)iconResolver(i));
+      }
+      else
+      {
+        test_spr.pushImage(x*20, y*20, 20, 20, (uint16_t*)altIconResolver(i));
+      }
+      i++;
+    }
+  }
     // map_spr.deleteSprite();
     // map_spr.createSprite(768, 768);
   }
@@ -150,6 +205,7 @@ static void update_map(lv_event_t *event)
     OldMapTile.tiley = CurrentMapTile.tiley;
     OldMapTile.file = CurrentMapTile.file;
 
+    listDir(SD, CurrentMapTile.dir, 0);
     log_v("TILE: %s", CurrentMapTile.file);
     log_v("ZOOM: %d", zoom);
 
@@ -216,5 +272,6 @@ static void update_map(lv_event_t *event)
     map_rot.drawCenterString(map_scale[zoom], 285, 350);
 
     sprArrow.pushRotated(&map_rot, 0, TFT_BLACK);
+    test_spr.pushSprite(&map_rot, 0, 0, TFT_BLACK);
   }
 }

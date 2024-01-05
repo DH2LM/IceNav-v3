@@ -47,6 +47,15 @@ void create_settings_scr()
     lv_obj_center(but_label);
     lv_obj_add_event_cb(touch_calib_but, touch_calib, LV_EVENT_CLICKED, NULL);
 
+    // Icon view
+    lv_obj_t *icon_menu_but = lv_btn_create(settingsScreen);
+    lv_obj_set_size(icon_menu_but, TFT_WIDTH - 30, 40);
+    but_label = lv_label_create(icon_menu_but);
+    lv_obj_set_style_text_font(but_label, &lv_font_montserrat_20, 0);
+    lv_label_set_text_static(but_label, "Icon View");
+    lv_obj_center(but_label);
+    lv_obj_add_event_cb(icon_menu_but, showIcons, LV_EVENT_CLICKED, NULL);
+
     // Back button
     lv_obj_t *back_but = lv_btn_create(settingsScreen);
     lv_obj_set_size(back_but, TFT_WIDTH - 30, 40);

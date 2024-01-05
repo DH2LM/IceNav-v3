@@ -57,12 +57,13 @@ TFT_eSprite map_rot = TFT_eSprite(&tft);
  *
  */
 TFT_eSprite zoom_spr = TFT_eSprite(&tft);
+TFT_eSprite test_spr = TFT_eSprite(&tft);
 
 /**
  * @brief Zoom Levels and Default zoom
  *
  */
-#define MIN_ZOOM 6
+#define MIN_ZOOM 0
 #define MAX_ZOOM 17
 #define DEF_ZOOM 17
 uint8_t zoom = DEF_ZOOM;

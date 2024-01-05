@@ -109,10 +109,7 @@ void touch_calibrate()
       f.close();
     }
 
-    uint16_t touchX, touchY;
-    while (!tft.getTouch(&touchX, &touchY))
-    {
-    };
+
   }
 }
 
@@ -122,18 +119,22 @@ void touch_calibrate()
  */
 void init_tft()
 {
+  Serial.println("TFT init");
   tft.init();
   tft.setRotation(8);
   tft.initDMA();
   tft.startWrite();
   tft.fillScreen(TFT_BLACK);
   tft.endWrite();
-
-  gpio_set_drive_capability(GPIO_NUM_33, GPIO_DRIVE_CAP_3);
-  ledcAttachPin(TFT_BL, 0);
+  
+Serial.println("Driving LED");
+  gpio_set_drive_capability(GPIO_NUM_21, GPIO_DRIVE_CAP_3);
+  ledcAttachPin(LED_D, 0);
   ledcSetup(0, 5000, 8);
   ledcWrite(0, 255);
 #ifndef MAKERF_ESP32S3
+  Serial.println("Calibrate touch");
   touch_calibrate();
+  Serial.println("Touch calibrated.");
 #endif
 }

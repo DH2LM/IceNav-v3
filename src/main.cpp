@@ -69,17 +69,20 @@ void setup()
 #endif
   powerOn();
   load_preferences();
-  init_sd();
   init_SPIFFS();
   init_LVGL();
   init_tft();
   init_gps();
   init_ADC();
+    init_sd();
 
+  Serial.println("Sensors init'ed!");
   map_spr.deleteSprite();
   map_spr.createSprite(768, 768);
 
+  Serial.println("Splashing...");
   splash_scr();
+  Serial.println("Splashed!");
   // init_tasks();
 
 #ifdef DEFAULT_LAT
@@ -99,6 +102,7 @@ void loop()
 #ifdef MAKERF_ESP32S3
   lv_tick_inc(5);
 #endif
+  // Serial.println("Starting timer handler");
   lv_timer_handler();
   //lv_task_handler();
   
