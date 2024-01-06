@@ -130,6 +130,19 @@ void create_main_scr()
     lv_obj_add_event_cb(altitude, update_altitude, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_event_cb(speed_label, update_speed, LV_EVENT_VALUE_CHANGED, NULL);
 
+    // Map Tile Objects (at least trying)
+    lv_obj_t * btn = lv_btn_create(map_tile);
+    lv_obj_set_size(btn, 40, 40);
+    lv_obj_set_pos(btn, TFT_WIDTH-40, 0);
+    lv_obj_set_style_bg_img_src(btn, LV_SYMBOL_PLUS, 0);
+    lv_obj_add_event_cb(btn, zoom_in, LV_EVENT_CLICKED,  NULL);
+
+    btn = lv_btn_create(map_tile);
+    lv_obj_set_size(btn, 40, 40);
+    lv_obj_set_pos(btn, TFT_WIDTH-40, TFT_HEIGHT-67);
+    lv_obj_set_style_bg_img_src(btn, LV_SYMBOL_MINUS, 0);
+    lv_obj_add_event_cb(btn, zoom_out, LV_EVENT_CLICKED,  NULL);
+
     // Map Tile Events
     lv_obj_add_event_cb(map_tile, update_map, LV_EVENT_REFRESH, NULL);
     lv_obj_add_event_cb(mainScreen, get_zoom_value, LV_EVENT_GESTURE, NULL);

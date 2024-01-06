@@ -58,8 +58,8 @@ public:
             cfg.pin_cs = CS_D;
             cfg.pin_rst = RST_D;
             cfg.pin_busy = BUSY_D;
-            cfg.panel_width = 320;
-            cfg.panel_height = 240;
+            cfg.panel_width = TFT_WIDTH;
+            cfg.panel_height = TFT_HEIGHT;
             cfg.memory_width = 320;
             cfg.memory_height = 240;
             cfg.offset_x = 0;
@@ -88,9 +88,9 @@ public:
         {
             auto cfg = _touch_instance.config();
             cfg.x_min = 0;
-            cfg.x_max = 239;
+            cfg.x_max = TFT_HEIGHT - 1;
             cfg.y_min = 0;
-            cfg.y_max = 319;
+            cfg.y_max = TFT_WIDTH - 1;
             cfg.pin_int = INT_T;
             cfg.bus_shared = true;
             cfg.offset_rotation = 4;

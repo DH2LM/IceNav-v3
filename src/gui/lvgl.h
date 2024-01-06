@@ -168,4 +168,5 @@ void loadIconScreen()
 {
     is_main_screen = true;
     lv_scr_load(mainIconScreen);
+    lv_event_send(mainIconScreen, LV_EVENT_SCREEN_LOADED, NULL);
 }

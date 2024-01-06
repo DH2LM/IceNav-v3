@@ -39,38 +39,52 @@ void create_icon_scr()
     lv_obj_set_pos(mainIconScreen, 0, 0);
     lv_obj_set_flex_flow(mainIconScreen, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(mainIconScreen, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_t *but_label, *boobut_label;
+    lv_obj_t *but_label, *savebut_label;
 
 
-    // icons = lv_img_create(mainIconScreen);
-    // lv_img_set_src(icons, "F:/aprsicons-c.bin");
-    // lv_obj_set_pos(icons, 0, 0);
-    // lv_obj_add_flag(icons, LV_OBJ_FLAG_CLICKABLE);
-    // lv_obj_add_event_cb(icons, goback, LV_EVENT_PRESSED, NULL);
-
-
-    // lv_obj_t *boo_but = lv_btn_create(mainIconScreen);
-    // lv_obj_set_size(boo_but, TFT_WIDTH - 30, 40);
-    // boobut_label = lv_label_create(boo_but);
-    // lv_obj_set_style_text_font(boobut_label, &lv_font_montserrat_20, 0);
-    // lv_label_set_text_static(boobut_label, "Boo");
-    // lv_obj_center(boobut_label);
-    // lv_obj_add_event_cb(boo_but, draw_sprites, LV_EVENT_CLICKED, NULL);
-
-
-    lv_obj_t * img1 = lv_img_create(lv_scr_act());
-    lv_img_set_src(img1, (uint8_t*)phone_map);
-    lv_obj_align(img1, LV_ALIGN_CENTER, 0, -20);
-
-
+    //Spinbox, for selecting icons
     lv_example_spinbox_1();
 
 
-    lv_obj_t * cb;
-    cb = lv_checkbox_create(mainIconScreen);
-    lv_checkbox_set_text(cb, "Use alternative icon pallette");
-    lv_obj_add_event_cb(cb, toggle_pallette, LV_EVENT_ALL, NULL);
+    //Checkbox, for selecting icon pallette
+    cbAlt = lv_checkbox_create(mainIconScreen);
+    lv_checkbox_set_text(cbAlt, "Use alternative icon pallette");
+    lv_obj_add_event_cb(cbAlt, toggle_pallette, LV_EVENT_ALL, NULL);
 
+
+    //Textbox for Callsign entry
+    /*Create a label and position it above the text box*/
+    lv_obj_t * oneline_label = lv_label_create(mainIconScreen);
+    lv_label_set_text(oneline_label, "Call + SSID (e.g. N0CALL-1):");
+
+    /*Create the one-line mode text area*/
+    text_ta = lv_textarea_create(mainIconScreen);
+    lv_textarea_set_one_line(text_ta, true);
+    lv_textarea_set_password_mode(text_ta, false);
+    lv_textarea_set_max_length(text_ta, 9);
+    lv_textarea_set_text(text_ta, "N0CALL-1");
+    lv_obj_set_width(text_ta, lv_pct(40));
+    lv_obj_add_event_cb(text_ta, ta_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(text_ta, ta_event_tb, LV_EVENT_ALL, NULL);
+    lv_obj_align(text_ta, LV_ALIGN_TOP_RIGHT, -5, 20);
+
+    lv_obj_align_to(oneline_label, text_ta, LV_ALIGN_OUT_TOP_LEFT, 0, 0);
+
+    /*Create a keyboard*/
+    kb = lv_keyboard_create(mainIconScreen);
+    lv_obj_set_size(kb,  LV_HOR_RES, LV_VER_RES / 2);
+    lv_keyboard_set_mode(kb, LV_KEYBOARD_MODE_TEXT_UPPER);
+    lv_keyboard_set_textarea(kb, text_ta); /*Focus it on one of the text areas to start*/
+    lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+
+    //Save button
+    lv_obj_t *save_but = lv_btn_create(mainIconScreen);
+    lv_obj_set_size(save_but, TFT_WIDTH - 30, 40);
+    savebut_label = lv_label_create(save_but);
+    lv_obj_set_style_text_font(savebut_label, &lv_font_montserrat_20, 0);
+    lv_label_set_text_static(savebut_label, "Save");
+    lv_obj_center(savebut_label);
+    lv_obj_add_event_cb(save_but, save_settings_bt, LV_EVENT_CLICKED, NULL);
     
     // Back button
     lv_obj_t *back_but = lv_btn_create(mainIconScreen);
@@ -79,8 +93,18 @@ void create_icon_scr()
     lv_obj_set_style_text_font(but_label, &lv_font_montserrat_20, 0);
     lv_label_set_text_static(but_label, "Back");
     lv_obj_center(but_label);
-    lv_obj_add_event_cb(spinbox, draw_sprites_first, LV_EVENT_SCREEN_LOADED, NULL);
+    lv_obj_add_event_cb(mainIconScreen, draw_sprites_first, LV_EVENT_DRAW_POST_END, NULL);
+    lv_obj_add_event_cb(mainIconScreen, draw_sprites_first, LV_EVENT_READY, NULL);
+    // lv_obj_add_event_cb(mainIconScreen, draw_sprites_first, LV_EVENT_REFRESH, NULL);
     lv_obj_add_event_cb(back_but, goback, LV_EVENT_CLICKED, NULL);
+
+    //Preinitialize with values
+    lv_textarea_set_text(text_ta, userSettings.callsign);
+    lv_spinbox_set_value(spinbox, userSettings.icon);
+    if(userSettings.isAlt) lv_obj_add_state(cbAlt, LV_STATE_CHECKED);
+
+    altPal = userSettings.isAlt;
+    icon_id = userSettings.icon;
 }
 
 

@@ -129,6 +129,36 @@ static void get_zoom_value(lv_event_t *event)
   }
 }
 
+static void zoom_in(lv_event_t *event)
+{
+  lv_obj_t *screen = lv_event_get_current_target(event);
+  lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_get_act());
+  if (act_tile == MAP && is_main_screen)
+  {
+      if (zoom >= MIN_ZOOM && zoom < MAX_ZOOM)
+      {
+        zoom++;
+        lv_event_send(map_tile, LV_EVENT_REFRESH, NULL);
+      }
+  }
+}
+
+
+static void zoom_out(lv_event_t *event)
+{
+  lv_obj_t *screen = lv_event_get_current_target(event);
+  lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_get_act());
+  if (act_tile == MAP && is_main_screen)
+  {
+    if (zoom <= MAX_ZOOM && zoom > MIN_ZOOM)
+    {
+      zoom--;
+      lv_event_send(map_tile, LV_EVENT_REFRESH, NULL);
+    }
+  }
+}
+
+
 /**
  * @brief Delete map screen sprites and release PSRAM
  *
@@ -148,12 +178,21 @@ static void delete_map_scr_sprites()
 static void create_map_scr_sprites()
 {
   // Map Sprite
-  map_rot.createSprite(320, 374);
+  map_rot.createSprite(TFT_WIDTH-40, TFT_HEIGHT-27);
   map_rot.pushSprite(0, 27);
   // Arrow Sprite
-  sprArrow.createSprite(20, 20);
+  sprArrow.createSprite(60, 32);
   sprArrow.setColorDepth(16);
-  sprArrow.pushImage(0, 0, 20, 20, (uint16_t *)navigation);
+  sprArrow.setTextColor(TFT_DARKGREEN, TFT_LIGHTGREY);
+  sprArrow.drawCenterString(userSettings.callsign, 30, 20);
+  if(!userSettings.isAlt)
+  { 
+    sprArrow.pushImage(20, 0, 20, 20, (uint16_t *)iconResolver(userSettings.icon));
+  }
+  else
+  {
+    sprArrow.pushImage(20, 0, 20, 20, (uint16_t *)altIconResolver(userSettings.icon));
+  }
   // Zoom Sprite
   zoom_spr.createSprite(48, 28);
   zoom_spr.setColorDepth(16);
@@ -178,22 +217,22 @@ static void update_map(lv_event_t *event)
     useAlt = !useAlt;
       test_spr.createSprite(TFT_WIDTH, TFT_HEIGHT);
   test_spr.setColorDepth(16);
-  uint8_t i=0;
-  for(int y=0; y<6; y++)
-  {
-    for(int x=0; x<16; x++)
-    {
-      if(!useAlt)
-      {
-        test_spr.pushImage(x*20, y*20, 20, 20, (uint16_t*)iconResolver(i));
-      }
-      else
-      {
-        test_spr.pushImage(x*20, y*20, 20, 20, (uint16_t*)altIconResolver(i));
-      }
-      i++;
-    }
-  }
+  // uint8_t i=0;
+  // for(int y=0; y<6; y++)
+  // {
+  //   for(int x=0; x<16; x++)
+  //   {
+  //     if(!useAlt)
+  //     {
+  //       test_spr.pushImage(x*20, y*20, 20, 20, (uint16_t*)iconResolver(i));
+  //     }
+  //     else
+  //     {
+  //       test_spr.pushImage(x*20, y*20, 20, 20, (uint16_t*)altIconResolver(i));
+  //     }
+  //     i++;
+  //   }
+  // }
     // map_spr.deleteSprite();
     // map_spr.createSprite(768, 768);
   }
@@ -266,10 +305,21 @@ static void update_map(lv_event_t *event)
 
     map_rot.fillRectAlpha(250, 342, 70, TFT_WIDTH - 245, 95, TFT_BLACK);
     map_rot.setTextSize(1);
-    map_rot.drawFastHLine(255,360,60);
-    map_rot.drawFastVLine(255,355,10);
-    map_rot.drawFastVLine(315,355,10);
-    map_rot.drawCenterString(map_scale[zoom], 285, 350);
+
+    //  map_rot.createSprite(320, 374);
+    //Original screen size was 320 * 374
+    //New screen size is 240 * 320
+    //Scaling: 0.667 * 0.75
+
+    // map_rot.drawFastHLine(255,360,60);
+    // map_rot.drawFastVLine(255,355,10);
+    // map_rot.drawFastVLine(315,355,10);
+    // map_rot.drawCenterString(map_scale[zoom], 285, 350);
+
+    map_rot.drawFastHLine(TFT_WIDTH-120, TFT_HEIGHT-47, 60);
+    map_rot.drawFastVLine(TFT_WIDTH-120, TFT_HEIGHT-52,10);
+    map_rot.drawFastVLine(TFT_WIDTH-60, TFT_HEIGHT-52 ,10);
+    map_rot.drawCenterString(map_scale[zoom], TFT_WIDTH-90, TFT_HEIGHT-57);
 
     sprArrow.pushRotated(&map_rot, 0, TFT_BLACK);
     test_spr.pushSprite(&map_rot, 0, 0, TFT_BLACK);

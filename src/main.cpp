@@ -41,6 +41,7 @@ unsigned long millis_actual = 0;
 #include "utils/lv_sd_fs.h"
 #include "utils/time_zone.h"
 #include "utils/preferences.h"
+#include "utils/s_settings.h"
 #include "gui/lvgl.h"
 
 #include "tasks.h"
@@ -70,11 +71,12 @@ void setup()
   powerOn();
   load_preferences();
   init_SPIFFS();
+  init_settings();
   init_LVGL();
   init_tft();
   init_gps();
   init_ADC();
-    init_sd();
+  init_sd();
 
   Serial.println("Sensors init'ed!");
   map_spr.deleteSprite();

@@ -18,6 +18,10 @@
 #include "gui/aprsicons/alt/include.h"
 
 static lv_obj_t * spinbox;
+static lv_obj_t * kb;
+static lv_obj_t * cbAlt;
+static lv_obj_t * text_ta;
+
 
 TFT_eSprite icon_spr = TFT_eSprite(&tft);
 TFT_eSprite scaled_icon_spr = TFT_eSprite(&tft);
@@ -455,4 +459,44 @@ static void toggle_pallette(lv_event_t * e)
 static void draw_sprites_first(lv_event_t * e)
 {
     draw_sprites();
+}
+
+
+static void ta_event_cb(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * ta = lv_event_get_target(e);
+    if(code == LV_EVENT_CLICKED || code == LV_EVENT_FOCUSED) {
+        /*Focus on the clicked text area*/
+        if(kb != NULL) lv_keyboard_set_textarea(kb, ta);
+    }
+
+    else if(code == LV_EVENT_READY) {
+        LV_LOG_USER("Ready, current text: %s", lv_textarea_get_text(ta));
+    }
+}
+
+static void ta_event_tb(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * ta = lv_event_get_target(e);
+
+    if(code == LV_EVENT_CLICKED || code == LV_EVENT_FOCUSED) {
+        /*Focus on the clicked text area*/
+        lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
+        if(kb != NULL) lv_keyboard_set_textarea(kb, ta);
+    }
+    if(code == LV_EVENT_DEFOCUSED)
+    {
+        lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+    }
+}
+
+static void save_settings_bt(lv_event_t * e)
+{
+    strcpy(userSettings.callsign, lv_textarea_get_text(text_ta));
+    userSettings.icon = lv_spinbox_get_value(spinbox);
+    userSettings.isAlt = lv_obj_get_state(cbAlt) & LV_STATE_CHECKED ? true : false;
+
+    save_settings();
 }
