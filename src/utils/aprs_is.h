@@ -1,8 +1,8 @@
 #ifndef APRS_IS_H_
 #define APRS_IS_H_
 
-#define WIFI_NAME "YOUR_SSID"
-#define WIFI_KEY "YOUR_PASS"
+#define WIFI_NAME "YOUR_WIFI"
+#define WIFI_KEY "YOUR_WIFI_KEY"
 
 #define USER userSettings.callsign
 #define PASS "00000"
