@@ -432,7 +432,7 @@ void draw_is_stations()
               is_spr.setTextColor(0x18E3, 0x05FF);
               break;              
           }
-          is_spr.drawChar(cs.overlayltr, ix-2, iy-3);
+          is_spr.drawChar(cs.overlayltr, ix-3, iy-4);
         }
       }
 
