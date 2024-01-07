@@ -1,0 +1,10 @@
+********************************************************************************
+Obsolete PIO Core v4.3.4 is used (previous was 6.1.11)
+Please remove multiple PIO Cores from a system:
+https://docs.platformio.org/page/faq.html#multiple-pio-cores-in-a-system
+********************************************************************************
+Processing CUSTOMBOARD (board: esp32dev; platform: espressif32; framework: arduino)
+--------------------------------------------------------------------------------
+PlatformManager: Installing espressif32
+espressif32 @ 6.5.0 is already installed
+Error: Unknown development platform 'espressif32'

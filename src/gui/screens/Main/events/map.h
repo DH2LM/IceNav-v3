@@ -8,6 +8,14 @@
 
 bool useAlt=false;
 uint16_t refreshTimer=0;
+double m_per_pixel=0.0;
+
+double get_m_per_pixel(int lat)
+{
+  double Spixel = 40075016.686 * cos(lat);
+  Spixel = Spixel / pow(2.0, zoom+8.0);
+  return Spixel;
+}
 
 void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
   Serial.printf("Listing directory: %s\n", dirname);
@@ -201,6 +209,8 @@ static void create_map_scr_sprites()
   zoom_spr.pushImage(0, 0, 24, 24, (uint16_t *)zoom_ico);
 
   draw_is_stations();
+
+  m_per_pixel = get_m_per_pixel(round(getLat()));
 }
 
 /**
@@ -227,7 +237,8 @@ static void update_map(lv_event_t *event)
     //     i++;
     //   }
     // }
-    draw_is_stations();
+
+    m_per_pixel = get_m_per_pixel(round(getLat()));
   }
 
   if (!is_map_draw)
@@ -314,50 +325,60 @@ static void update_map(lv_event_t *event)
     map_rot.drawFastVLine(TFT_WIDTH-60, TFT_HEIGHT-52 ,10);
     map_rot.drawCenterString(map_scale[zoom], TFT_WIDTH-90, TFT_HEIGHT-57);
 
+    char status[100];
+    sprintf(status, "%d Stations in list!", list_len);
+    map_rot.drawString(status, 0, TFT_HEIGHT-37);
 
-    is_spr.pushSprite(&tft, TFT_WIDTH-40, TFT_HEIGHT-27, TFT_BLACK);
+
+    draw_is_stations();
+
+    is_spr.pushRotated(&map_rot, 0, TFT_BLACK);
     sprArrow.pushRotated(&map_rot, 0, TFT_BLACK);
   }
 }
 
 void draw_is_stations()
 {
-  // is_spr.deleteSprite();
-  // is_spr.createSprite(TFT_WIDTH-40, TFT_HEIGHT-27);
-  // is_spr.setColorDepth(16);
+  is_spr.deleteSprite();
+  is_spr.createSprite(TFT_WIDTH-40, TFT_HEIGHT-27);
+  is_spr.setColorDepth(16);
   //Main Station is in middle -> Calculate max distance using pythagoras
   //The distance being the length of the hypothenuse
-  double py_a = (double)(TFT_WIDTH-40) / 2.0;
-  double py_b = (double)(TFT_HEIGHT-27) / 2.0;
-  double py_c = sqrt(pow(py_a,2) + pow(py_b,2));
+  float py_a = (float)(TFT_WIDTH-40) / 2.0;
+  float py_b = (float)(TFT_HEIGHT-27) / 2.0;
+  float py_c = sqrtf(powf(py_a,2) + powf(py_b,2));
 
-  //Spixel = Stile / 256 = C ∙ cos(latitude) / 2 (zoomlevel + 8)
-  //Distance per pixel
-  double Spixel = (40075016.686 * cos(round(getLat()))) / pow(2.0, zoom+8.0);
 
-  double max_dist_m = Spixel * py_c;
+  float max_dist_m = m_per_pixel * py_c;
 
-  log_d("Max distance: %fm", max_dist_m);
-  log_d("(%fm/px)", Spixel);
+  // log_d("Max distance: %fm", max_dist_m);
+  // log_d("(%fm/px)", m_per_pixel);
 
   for(int i=0; i<list_len; i++)
   {
     station cs = stationsList[i];
-    double distance = GPS.distanceBetween(getLat(), getLon(), cs.lat, cs.lon);
-    double heading = GPS.courseTo(getLat(), getLon(), cs.lat, cs.lon);
-    log_d("sin(%f)=%f cos(%f)=%f", heading, sin(heading), heading, cos(heading));
+    float distance = GPS.distanceBetween(getLat(), getLon(), cs.lat, cs.lon);
+    float heading = GPS.courseTo(getLat(), getLon(), cs.lat, cs.lon);
 
-    if(distance <= max_dist_m)
+    heading = (heading / 180.0) * PI;
+    heading = heading - (PI/2.0);
+    // log_d("Pos: %f / %f", getLat(), getLon());
+
+    if(true)
     {
       //Draw the station
       //Calculate Coords with polar coordinate rules
-      double x = distance * cos(heading) / Spixel;
-      double y = distance * sin(heading) / Spixel;
+      // double x = distance * cos(heading) / m_per_pixel;
+      // double y = distance * sin(heading) / Spixel;
+      distance = distance / m_per_pixel;
 
-      int ix = TFT_WIDTH-40+(int)round(x);
-      int iy = TFT_HEIGHT-27+(int)round(y);
+      int ix = round(distance * cos(heading));
+      int iy = round(distance * sin(heading));
 
-      log_v("\"%s\" is in range! x=%d y=%d dist=%f hd=%f",cs.callsign, ix, iy, distance, heading);
+      ix+=(TFT_WIDTH-40)/2;
+      iy+=(TFT_HEIGHT-27)/2;
+
+      // log_v("\"%s\" is in range! x=%d y=%d dist=%f hd=%f",cs.callsign, ix, iy, distance, (heading/PI)*180.0);
 
       if(!cs.altpal)
       {
@@ -367,20 +388,51 @@ void draw_is_stations()
       {
         is_spr.pushImage(ix-10, iy-10, 20, 20, (uint16_t*)altIconResolver(cs.icon));
         uint8_t olaytxt = altIconCheckDraw(cs.icon);
-        char olayltr[2]="O";
-        switch(olaytxt)
+        if(olaytxt > 0)
         {
-          case 1:
-            olayltr[1]=cs.overlayltr;
-            is_spr.setTextColor(TFT_WHITE, TFT_BLACK);
-            is_spr.drawString(olayltr, ix-5, iy-5);
-            break;
+        switch(olaytxt)
+          {
+            case 1:
+              is_spr.setTextColor(TFT_WHITE, 0x18E3);
+              break;
 
-          case 2:
-            olayltr[1]=cs.overlayltr;
-            is_spr.setTextColor(TFT_DARKGREY, TFT_WHITE);
-            is_spr.drawString(olayltr, ix-5, iy-5);
-            break;
+            case 2:
+              is_spr.setTextColor(0x18E3, TFT_WHITE);
+              break;
+
+            case 3:
+              is_spr.setTextColor(TFT_WHITE, 0xF800);
+              break;
+              
+            case 4:
+              is_spr.setTextColor(TFT_WHITE, 0x001F);
+              break;
+              
+            case 5:
+              is_spr.setTextColor(0x18E3, 0xCE79);
+              break;
+              
+            case 6:
+              is_spr.setTextColor(TFT_WHITE, 0x0420);
+              break;
+              
+            case 7:
+              is_spr.setTextColor(TFT_WHITE, 0x3186);
+              break;
+              
+            case 8:
+              is_spr.setTextColor(0x18E3, 0x8C71);
+              break;
+              
+            case 9:
+              is_spr.setTextColor(0x18E3, 0xFFE0);
+              break;
+              
+            case 10:
+              is_spr.setTextColor(0x18E3, 0x05FF);
+              break;              
+          }
+          is_spr.drawChar(cs.overlayltr, ix-2, iy-3);
         }
       }
 
@@ -389,7 +441,7 @@ void draw_is_stations()
     }
     else
     {
-      log_v("\"%s\" is not in range! (%fm, %fm max)", cs.callsign, distance, max_dist_m);
+      // log_v("\"%s\" is not in range! (%fm, %fm max)", cs.callsign, distance, max_dist_m);
     }
   }
 }

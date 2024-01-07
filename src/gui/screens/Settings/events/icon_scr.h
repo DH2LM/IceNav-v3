@@ -392,40 +392,54 @@ static const char* altIconResolver(uint8_t id)
 
 uint8_t altIconCheckDraw(uint8_t iconid)
 {
+    /*
+        Werte:
+        0 - Nix
+        1 - Weiß auf Schwarz
+        2 - Schwarz auf Weiß
+        3 - Weiß auf Rot
+        4 - Weiß auf Blau
+        5 - Schwarz auf hellgrau
+        6 - Weiß auf Grün
+        7 - Weiß auf Mittelgrau
+        8 - Schwarz auf Hellgrau (Plane)
+        9 - Schwarz auf Gelb
+        10 - Schwarz auf Hellblau
+    */
     switch(iconid)
     {
         case 2:
-            return 1;
+            return 6;
         case 5:
             return 1;
         case 15:
-            return 1;
+            return 5;
         case 29:
-            return 1;
+            return 3;
         case 32:
             return 2;
         case 54:
-            return 1;
+            return 6;
         case 61:
-            return 2;
+            return 8;
         case 62:
-            return 1;
+            return 4;
         case 64:
-            return 2;
+            return 3;
         case 66:
-            return 2;
+            return 9;
         case 72:
             return 1;
         case 77:
-            return 2;
+            return 3;
         case 82:
-            return 1;
+            return 7;
         case 84:
-            return 1;
+            return 3;
         case 85:
-            return 2;
+            return 10;
         case 89:
-            return 1;
+            return 3;
         default:
             return 0;
     }

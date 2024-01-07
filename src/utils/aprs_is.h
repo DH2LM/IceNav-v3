@@ -40,6 +40,9 @@ station stationsList[64];
 uint8_t list_len = 0;
 uint8_t list_ptr = 0;
 
+uint8_t timeout_timer_aprs_is=0;
+bool disable_is = false;
+
 APRS_IS* aprs_is;
 
 void setup_aprs_is()
@@ -50,12 +53,24 @@ void setup_aprs_is()
 	WiFi.mode(WIFI_STA);
 	WiFi.begin(WIFI_NAME, WIFI_KEY);
 	Serial.print("Waiting for WiFi");
-
+    tft.drawString("Waiting for WiFi", 0, 20);
 	while(WiFi.status() != WL_CONNECTED)
 	{
 		Serial.print(".");
 		delay(500);
+
+        timeout_timer_aprs_is++;
+        if(timeout_timer_aprs_is > 40)
+        {
+            disable_is = true;
+            tft.drawString("TIMEOUT!",0,30);
+            delay(1000);
+            return;
+        }
 	}
+
+    tft.drawString("Connected!", 0, 30);
+
 
 	Serial.println("");
 	Serial.println("WiFi connected");
@@ -69,40 +84,43 @@ bool newStation(const char callsign[9], const char message[256]);
 void listStations();
 void aprs_is_loop()
 {
-	if(!aprs_is->connected())
-	{
-		Serial.print("connecting to server: ");
-		Serial.print(SERVER);
-		Serial.print(" on port: ");
-		Serial.println(PORT);
-		if(!aprs_is->connect(SERVER, PORT, FILTER))
-		{
-			Serial.println("Connection failed.");
-			Serial.println("Waiting 5 seconds before retrying...");
-			delay(5000);
-			return;
-		}
-		Serial.println("Connected to server!");
-	}
-	if(aprs_is->available() > 0)
-	{
-		String msg_ = aprs_is->getMessage();
-		if(msg_.startsWith("#"))
-		{
-			Serial.println(msg_);
-		}
-		else
-		{
-			APRSMessage msg;
-			msg.decode(msg_);
-			Serial.println(msg.toString());
-
-            if(newStation(msg.getSource().c_str(), msg.getBody()->toString().c_str()))
+    if(!disable_is)
+    {
+        if(!aprs_is->connected())
+        {
+            Serial.print("connecting to server: ");
+            Serial.print(SERVER);
+            Serial.print(" on port: ");
+            Serial.println(PORT);
+            if(!aprs_is->connect(SERVER, PORT, FILTER))
             {
-                listStations();
+                Serial.println("Connection failed.");
+                Serial.println("Waiting 5 seconds before retrying...");
+                delay(5000);
+                return;
             }
-		}
-	}
+            Serial.println("Connected to server!");
+        }
+        if(aprs_is->available() > 0)
+        {
+            String msg_ = aprs_is->getMessage();
+            if(msg_.startsWith("#"))
+            {
+                Serial.println(msg_);
+            }
+            else
+            {
+                APRSMessage msg;
+                msg.decode(msg_);
+                Serial.println(msg.toString());
+
+                if(newStation(msg.getSource().c_str(), msg.getBody()->toString().c_str()))
+                {
+                    listStations();
+                }
+            }
+        }
+    }
 }
 
 bool parseMsg(const char message[256], float* lat, float* lon, uint8_t* icon, bool* altpal, char* overlayltr);
@@ -176,9 +194,9 @@ float getDecimal(float raw_val)
     val = floor(raw_val);
 
     mins = (raw_val - floor(raw_val)) * 100;
-    val+=(mins/60.0);
+    val+=(floor(mins)/60.0);
 
-    secs = (mins-floor(mins)) * 100;
+    secs = (mins-floor(mins)) * 60;
     val+=(secs/3600.0);
 
     return val;
