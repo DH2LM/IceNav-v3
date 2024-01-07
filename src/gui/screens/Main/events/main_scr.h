@@ -57,7 +57,7 @@ TFT_eSprite map_rot = TFT_eSprite(&tft);
  *
  */
 TFT_eSprite zoom_spr = TFT_eSprite(&tft);
-TFT_eSprite test_spr = TFT_eSprite(&tft);
+TFT_eSprite is_spr = TFT_eSprite(&tft);
 
 /**
  * @brief Zoom Levels and Default zoom

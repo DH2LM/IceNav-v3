@@ -42,6 +42,7 @@ unsigned long millis_actual = 0;
 #include "utils/time_zone.h"
 #include "utils/preferences.h"
 #include "utils/s_settings.h"
+#include "utils/aprs_is.h"
 #include "gui/lvgl.h"
 
 #include "tasks.h"
@@ -77,6 +78,7 @@ void setup()
   init_gps();
   init_ADC();
   init_sd();
+  setup_aprs_is();
 
   Serial.println("Sensors init'ed!");
   map_spr.deleteSprite();
@@ -107,7 +109,7 @@ void loop()
   // Serial.println("Starting timer handler");
   lv_timer_handler();
   //lv_task_handler();
-  
+  aprs_is_loop();
   while (gps->available()>0)
   {
 #ifdef OUTPUT_NMEA

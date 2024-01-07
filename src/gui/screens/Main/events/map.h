@@ -7,6 +7,7 @@
  */
 
 bool useAlt=false;
+uint16_t refreshTimer=0;
 
 void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
   Serial.printf("Listing directory: %s\n", dirname);
@@ -168,13 +169,14 @@ static void delete_map_scr_sprites()
   sprArrow.deleteSprite();
   map_rot.deleteSprite();
   zoom_spr.deleteSprite();
-  test_spr.deleteSprite();
+  is_spr.deleteSprite();
 }
 
 /**
  * @brief Create a map screen sprites
  *
  */
+void draw_is_stations();
 static void create_map_scr_sprites()
 {
   // Map Sprite
@@ -197,6 +199,8 @@ static void create_map_scr_sprites()
   zoom_spr.createSprite(48, 28);
   zoom_spr.setColorDepth(16);
   zoom_spr.pushImage(0, 0, 24, 24, (uint16_t *)zoom_ico);
+
+  draw_is_stations();
 }
 
 /**
@@ -213,28 +217,17 @@ static void update_map(lv_event_t *event)
   {
     is_map_draw = false;
     map_found = false;
-    test_spr.deleteSprite();
-    useAlt = !useAlt;
-      test_spr.createSprite(TFT_WIDTH, TFT_HEIGHT);
-  test_spr.setColorDepth(16);
-  // uint8_t i=0;
-  // for(int y=0; y<6; y++)
-  // {
-  //   for(int x=0; x<16; x++)
-  //   {
-  //     if(!useAlt)
-  //     {
-  //       test_spr.pushImage(x*20, y*20, 20, 20, (uint16_t*)iconResolver(i));
-  //     }
-  //     else
-  //     {
-  //       test_spr.pushImage(x*20, y*20, 20, 20, (uint16_t*)altIconResolver(i));
-  //     }
-  //     i++;
-  //   }
-  // }
-    // map_spr.deleteSprite();
-    // map_spr.createSprite(768, 768);
+
+    // uint8_t i=0;
+    // for(int y=0; y<10; y++)
+    // {
+    //   for(int x=0; x<10; x++)
+    //   {
+    //     is_spr.pushImage(x*20, y*20, 20, 20, (uint16_t*)iconResolver(i));
+    //     i++;
+    //   }
+    // }
+    draw_is_stations();
   }
 
   if (!is_map_draw)
@@ -321,7 +314,82 @@ static void update_map(lv_event_t *event)
     map_rot.drawFastVLine(TFT_WIDTH-60, TFT_HEIGHT-52 ,10);
     map_rot.drawCenterString(map_scale[zoom], TFT_WIDTH-90, TFT_HEIGHT-57);
 
+
+    is_spr.pushSprite(&tft, TFT_WIDTH-40, TFT_HEIGHT-27, TFT_BLACK);
     sprArrow.pushRotated(&map_rot, 0, TFT_BLACK);
-    test_spr.pushSprite(&map_rot, 0, 0, TFT_BLACK);
+  }
+}
+
+void draw_is_stations()
+{
+  // is_spr.deleteSprite();
+  // is_spr.createSprite(TFT_WIDTH-40, TFT_HEIGHT-27);
+  // is_spr.setColorDepth(16);
+  //Main Station is in middle -> Calculate max distance using pythagoras
+  //The distance being the length of the hypothenuse
+  double py_a = (double)(TFT_WIDTH-40) / 2.0;
+  double py_b = (double)(TFT_HEIGHT-27) / 2.0;
+  double py_c = sqrt(pow(py_a,2) + pow(py_b,2));
+
+  //Spixel = Stile / 256 = C ∙ cos(latitude) / 2 (zoomlevel + 8)
+  //Distance per pixel
+  double Spixel = (40075016.686 * cos(round(getLat()))) / pow(2.0, zoom+8.0);
+
+  double max_dist_m = Spixel * py_c;
+
+  log_d("Max distance: %fm", max_dist_m);
+  log_d("(%fm/px)", Spixel);
+
+  for(int i=0; i<list_len; i++)
+  {
+    station cs = stationsList[i];
+    double distance = GPS.distanceBetween(getLat(), getLon(), cs.lat, cs.lon);
+    double heading = GPS.courseTo(getLat(), getLon(), cs.lat, cs.lon);
+    log_d("sin(%f)=%f cos(%f)=%f", heading, sin(heading), heading, cos(heading));
+
+    if(distance <= max_dist_m)
+    {
+      //Draw the station
+      //Calculate Coords with polar coordinate rules
+      double x = distance * cos(heading) / Spixel;
+      double y = distance * sin(heading) / Spixel;
+
+      int ix = TFT_WIDTH-40+(int)round(x);
+      int iy = TFT_HEIGHT-27+(int)round(y);
+
+      log_v("\"%s\" is in range! x=%d y=%d dist=%f hd=%f",cs.callsign, ix, iy, distance, heading);
+
+      if(!cs.altpal)
+      {
+        is_spr.pushImage(ix-10, iy-10, 20, 20, (uint16_t*)iconResolver(cs.icon));
+      }
+      else
+      {
+        is_spr.pushImage(ix-10, iy-10, 20, 20, (uint16_t*)altIconResolver(cs.icon));
+        uint8_t olaytxt = altIconCheckDraw(cs.icon);
+        char olayltr[2]="O";
+        switch(olaytxt)
+        {
+          case 1:
+            olayltr[1]=cs.overlayltr;
+            is_spr.setTextColor(TFT_WHITE, TFT_BLACK);
+            is_spr.drawString(olayltr, ix-5, iy-5);
+            break;
+
+          case 2:
+            olayltr[1]=cs.overlayltr;
+            is_spr.setTextColor(TFT_DARKGREY, TFT_WHITE);
+            is_spr.drawString(olayltr, ix-5, iy-5);
+            break;
+        }
+      }
+
+      is_spr.setTextColor(TFT_BLUE, TFT_LIGHTGREY);
+      is_spr.drawCenterString(cs.callsign, ix, iy+10);
+    }
+    else
+    {
+      log_v("\"%s\" is not in range! (%fm, %fm max)", cs.callsign, distance, max_dist_m);
+    }
   }
 }
