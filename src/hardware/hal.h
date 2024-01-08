@@ -34,7 +34,12 @@
   // #define GPS_RX 35
 
   #define GPS_TX 27
-  #define GPS_RX 22
+  #define GPS_RX 4
+
+  //Still free pins: 35, 4, 21 can be freed
+  #define LORA_DIO0 35
+  #define LORA_CS 22
+  #define LORA_RS 21
 
 /**
  * @brief SD pin definition
@@ -45,8 +50,8 @@
   #define SD_MOSI 23
   #define SD_CLK 18
 
-  #define I2C_SDA_PIN 4
-  #define I2C_SCL_PIN 35
+  // #define I2C_SDA_PIN 4
+  // #define I2C_SCL_PIN 35
 #endif
 
 #ifdef MAKERF_ESP32S3  // TODO: we need find the right pins for this board
